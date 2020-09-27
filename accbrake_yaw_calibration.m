@@ -10,11 +10,20 @@ function [s, status] = accbrake_yaw_calibration(ax, ay)
 % accelerometer.
 
 G_THRESHOLD = 0.2; % at least an acceleration of 2m/s2
+MIN_PTS = 3;
 
 i_ax_pos = find(ax > G_THRESHOLD);
 i_ax_neg = find(ax < -G_THRESHOLD);
 i_ay_pos = find(ay > G_THRESHOLD);
 i_ay_neg = find(ay < -G_THRESHOLD);
+
+if (length(i_ax_pos) + length(i_ax_neg)) < MIN_PTS
+    if (length(i_ay_pos) + length(i_ay_neg)) < MIN_PTS
+        status = 0;
+        s = NaN;
+        return;
+    end
+end
 
 % Find a "first estimate" axis orientation
 if (length(i_ax_pos) + length(i_ax_neg)) > (length(i_ay_pos) + length(i_ay_neg))
