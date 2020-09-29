@@ -5,12 +5,13 @@ function CleanDataLoggerGui()
 % through constants into the code rather than through buttons and active
 % interfaces, to keep speed up.
 
-COM_PORT = 'COM6';
+COM_PORT = 'COM4';
 HORIZONTAL_PANEL_SEP = 1/3;
 VERTICAL_PANEL_SEP = 2/3;
+CAMERA_USE = false;
 VERTICAL_SEPARATION = false;
 BUTTON_FONTSIZE = 16;
-CAMERA_ID = 2;
+CAMERA_ID = 1;
 CAMERA_DT = .1; % 10 FPS
 CAMERA_ROTATION = 0;
 CAMERA_RESOLUTION = '320x240';
@@ -18,6 +19,7 @@ ZERO_CALIBRATION_POINTS = 100; % 5 sec @ 20Hz
 ANG_CALIBRATION_POINTS = 200; % 10 sec @ 20Hz   
 
 MainFigure = figure();
+if CAMERA_USE
 if VERTICAL_SEPARATION
     UpperPanel = uipanel('Parent', MainFigure, 'Units','norm', 'Position', [0 HORIZONTAL_PANEL_SEP 1 (1-HORIZONTAL_PANEL_SEP)], ...
         'BackgroundColor', [0 0 0], 'BorderType', 'none');
@@ -41,7 +43,22 @@ else
     LowerRightPanel = uipanel('Parent', LowerPanel, 'Units','norm', 'Position', [0 0 1 1/3], ...
         'BackgroundColor', [0 0 0], 'BorderType', 'none');
 end
-
+cam = webcam(CAMERA_ID);
+cam.Resolution = CAMERA_RESOLUTION;
+tw = TimedWebcam(cam, CAMERA_DT);
+tw.rotation = CAMERA_ROTATION;
+addlistener(tw, 'newSnapshotAvailable', @newFrame);
+Ax = axes('Parent',UpperPanel, 'Position',[0 0 1 1]);
+else
+    LowerPanel = uipanel('Parent', MainFigure, 'Units','norm', 'Position', [0 0 1 1], ...
+        'BackgroundColor', [0 0 0], 'BorderType', 'none');
+    LowerLeftPanel = uipanel('Parent', LowerPanel, 'Units','norm', 'Position', [0 0 1/3 1], ...
+        'BackgroundColor', [0 0 0], 'BorderType', 'none');
+    LowerCenterPanel = uipanel('Parent', LowerPanel, 'Units','norm', 'Position', [1/3 0 1/3 1], ...
+        'BackgroundColor', [0 0 0], 'BorderType', 'none');
+    LowerRightPanel = uipanel('Parent', LowerPanel, 'Units','norm', 'Position', [2/3 0 1/3 1], ...
+        'BackgroundColor', [0 0 0], 'BorderType', 'none');
+end
 Tacho = TachoObj(LowerLeftPanel, 0, 250, 130, 'km/h', 6);
 Gg = GGObj(LowerCenterPanel, [0 0 1 1], 100);
 
@@ -58,6 +75,7 @@ RecordBtn = uicontrol('Parent', LowerRightPanel, 'Style','pushbutton', ...
 
 
 DL = CalibratingDataLogger(COM_PORT); 
+DL.parse_fcn = @dlp_SensorLogger;
 DL.initialize();
 addlistener(DL, 'zeroCalibrationSuccess', @zeroCalibrationSuccessFcn);
 addlistener(DL, 'angCalibrationSuccess', @angCalibrationSuccessFcn);
@@ -65,16 +83,13 @@ addlistener(DL, 'angCalibrationFail', @angCalibrationFailFcn);
 addlistener(DL, 'newAccDataAvailable', @newAccDataAvailableFcn);
 addlistener(DL, 'newSpeedAvailable', @newSpeedAvailableFcn);
 
-cam = webcam(CAMERA_ID);
-cam.Resolution = CAMERA_RESOLUTION;
-tw = TimedWebcam(cam, CAMERA_DT);
-tw.rotation = CAMERA_ROTATION;
-addlistener(tw, 'newSnapshotAvailable', @newFrame);
-Ax = axes('Parent',UpperPanel, 'Position',[0 0 1 1]);
+
 
 set(MainFigure, 'DeleteFcn', @WindowDeleteFcn);
 
     function RecordFcn(obj, event)
+        %keyboard
+        %if 0
         if ~DL.mat_log
             DL.startFastOnTrigger();
             set(RecordBtn, 'BackGroundColor', [1 .8 .8]);
@@ -82,6 +97,7 @@ set(MainFigure, 'DeleteFcn', @WindowDeleteFcn);
             DL.stopFastOnTrigger();
             set(RecordBtn, 'BackGroundColor', [.8 .8 .8]);
         end
+        %end
     end
 
     function CalibrateZeroFcn(obj, event)

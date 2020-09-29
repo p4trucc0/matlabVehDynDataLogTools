@@ -59,16 +59,32 @@ end
 % Now I should find an angle (hopefully lower than 90°) reasonably close to
 % the now-X
 
-ang_acc = mean(atan2(ay(i_acc), ax(i_acc)));
-ang_brk_p = mean(atan2(ay(i_brk), ax(i_brk)));
-if ang_brk_p < 0
-    ang_brk = ang_brk_p + pi;
-else
-    ang_brk = ang_brk_p - pi;
-end
+% Con la media introduco contenuto casuale, perché devo contenerli in un
+% range a monte...
+ang_acc = mean(atan2_180(ay(i_acc), ax(i_acc)));
+ang_brk = mean(atan2_180(ay(i_brk), ax(i_brk)));
+% if ang_brk_p < 0
+%     ang_brk = ang_brk_p + pi;
+% else
+%     ang_brk = ang_brk_p - pi;
+% end
 
 status = 1;
 s = mean([ang_acc, ang_brk]) + pre_rot;
 
+    % Returns a value between -pi/2 and pi/2
+    function out = atan2_180(y, x)
+        out = atan2(y, x);
+        for ii = 1:length(out)
+            x1 = out(ii);
+            if x1 > pi/4
+                x1 = x1 - pi;
+            elseif x1 < -pi/4
+                x1 = x1 + pi;
+            end
+            out(ii) = x1;
+        end
+    end
 
 
+end

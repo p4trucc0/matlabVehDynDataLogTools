@@ -3,9 +3,11 @@ function [rho, beta] = find_zero_cal_angles(g_a)
 
 
 g0 = [0 0 -1]';
-rho1 = asin(-g_a(2));
+% rho1 = asin(-g_a(2));
+rho1 = asin(g_a(2));
 rho2 = pi - rho1;
-bet1 = atan2(-g_a(1), g_a(3));
+% bet1 = atan2(-g_a(1), g_a(3));
+bet1 = atan2(g_a(1), g_a(3));
 bet2 = bet1 + pi;
 
 

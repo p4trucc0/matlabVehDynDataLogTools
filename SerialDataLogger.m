@@ -133,6 +133,7 @@ classdef SerialDataLogger < handle
             if nG
                 obj.gps_data = n_gps;
                 notify(obj, 'newGpsDataAvailable', EventWithData(n_gps));
+                disp(n_gps.speed_kmh)
                 notify(obj, 'newSpeedAvailable', EventWithData(n_gps.speed_kmh));
             end
         end
