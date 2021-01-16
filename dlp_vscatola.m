@@ -12,6 +12,7 @@ if contains(line_in, 'ACC')
     try
         [~, ax, ay, az, rx, ry, rz] = parse_vsc_acc(line_in);
         acc.Time = now;
+        acc
         acc.ax = ax;
         acc.ay = ay;
         acc.az = az;

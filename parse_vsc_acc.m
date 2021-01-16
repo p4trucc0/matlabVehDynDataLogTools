@@ -3,7 +3,7 @@ function [t, ax, ay, az, rx, ry, rz] = parse_vsc_acc(str_in)
 % Parses acceleration data coming from the V-Scatola Arduino DataLogger
 
 LSB_TO_MS2 = (9.806/4096);
-LSB_TO_RADS = deg2rad(250/32768);
+LSB_TO_RADS = deg2rad(250/32768); % isnt it 205?
 
 ss = str_in(5:end);
 sc = strsplit(ss, ';');
