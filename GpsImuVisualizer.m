@@ -142,7 +142,7 @@ classdef GpsImuVisualizer < handle
             obj.axes.altitude.add_line(obj.v_gps.time, obj.v_gps.altitude);
             alt_add_str = ['Min = ', num2str(round(obj.metrics.partial.alt_min, 1)), ...
                 '; Max = ', num2str(round(obj.metrics.partial.alt_max, 1))];
-            obj.axes.altitude.set_add_str(str_add_str);
+            obj.axes.altitude.set_add_str(alt_add_str);
             obj.axes.accX.add_line(obj.v_acc.time, obj.v_acc.ax);
             acx_add_str = ['Accel. Max = ', num2str(round(obj.metrics.partial.ax_acc_max, 1)), ...
                 '; Frenata Max = ', num2str(round(obj.metrics.partial.ax_brk_max, 1))];
